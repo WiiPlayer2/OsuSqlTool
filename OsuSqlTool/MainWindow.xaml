@@ -1,0 +1,51 @@
+﻿<Window x:Class="OsuSqlTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OsuSqlTool"
+        mc:Ignorable="d" Loaded="Window_Loaded"
+        Title="osu!SQL Tool" Height="600" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Margin="5">
+            <ComboBox SelectedIndex="0" x:Name="ladderCombo" SelectionChanged="ladderCombo_Selected">
+                <local:SQLLadder>Beginner</local:SQLLadder>
+                <local:SQLLadder>Standard</local:SQLLadder>
+                <local:SQLLadder>Expert</local:SQLLadder>
+            </ComboBox>
+            <TextBlock VerticalAlignment="Center" Margin="5,0,5,0">
+                Scale:
+            </TextBlock>
+            <Slider x:Name="scaleSlider" Width="200" Margin="5,0,5,0" Minimum="0.5" Maximum="2" Value="1" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Width="Auto" Height="Auto" Margin="5" Click="ForgetLogin_Click">
+                Forget IRC Login
+            </Button>
+            <Button Click="Reload_Click" Width="Auto" Height="Auto"
+                HorizontalAlignment="Right" Margin="5">
+                Reload Maps
+            </Button>
+        </StackPanel>
+        <ScrollViewer Grid.Row="1">
+            <ScrollViewer.LayoutTransform>
+                <ScaleTransform CenterX="0" CenterY="0"
+                                ScaleX="{Binding ElementName=scaleSlider, Path=Value}" ScaleY="{Binding ElementName=scaleSlider, Path=Value}"/>
+            </ScrollViewer.LayoutTransform>
+            <StackPanel x:Name="mapPanel">
+                <TextBlock FontSize="20">
+                    No Mod
+                </TextBlock>
+                <WrapPanel>
+                    <local:MapControl />
+                    <local:MapControl />
+                    <local:MapControl />
+                </WrapPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
