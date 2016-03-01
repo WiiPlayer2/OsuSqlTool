@@ -30,6 +30,19 @@ namespace OsuSqlTool
             InitializeComponent();
         }
 
+        public MapControl(SQLMap map)
+            : this()
+        {
+            Map = map;
+            DataContext = map;
+
+            if (map.Category == SQLCategory.Tiebreaker)
+            {
+                pickButton.Visibility = Visibility.Collapsed;
+                banButton.Visibility = Visibility.Collapsed;
+            }
+        }
+
         public event RoutedEventHandler Picked
         {
             add
@@ -53,6 +66,8 @@ namespace OsuSqlTool
                 RemoveHandler(BannedEvent, value);
             }
         }
+
+        public SQLMap Map { get; private set; }
 
         private void Pick_Click(object sender, RoutedEventArgs e)
         {

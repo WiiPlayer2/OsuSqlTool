@@ -37,11 +37,11 @@
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0, 0, 5, 5"
                         Opacity="0.6">
                 <Button Width="50" Height="30" FontFamily="{StaticResource normalFont}"
-                        Click="Pick_Click">
+                        Click="Pick_Click" x:Name="pickButton">
                     Pick
                 </Button>
                 <Button Width="50" Height="30" FontFamily="{StaticResource normalFont}"
-                        Click="Ban_Click">
+                        Click="Ban_Click" x:Name="banButton">
                     Ban
                 </Button>
             </StackPanel>

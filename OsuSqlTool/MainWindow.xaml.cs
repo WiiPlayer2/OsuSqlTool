@@ -1,8 +1,11 @@
-﻿using IrcDotNet;
+﻿using GitHubUpdate;
+using IrcDotNet;
 using Newtonsoft.Json;
 using OsuSqlTool.Properties;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -46,6 +49,21 @@ namespace OsuSqlTool
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             ladderCombo.SelectedValue = Settings.Default.Ladder;
+            if (!DesignerProperties.GetIsInDesignMode(this))
+            {
+                Update.Init("WiiPlayer2", "OsuSqlTool");
+                if (Update.HasUpdate())
+                {
+                    var res = MessageBox.Show(
+                        string.Format("There is a newer version available at {0} \n(Current version: {1}; Newer version: {2})\n\nDo you want to download it now?",
+                        Update.ReleaseUrl, Update.CurrentVersion, Update.NewestVersion), "Update available!",
+                        MessageBoxButton.YesNo, MessageBoxImage.Information);
+                    if (res == MessageBoxResult.Yes)
+                    {
+                        Process.Start(Update.ReleaseUrl);
+                    }
+                }
+            }
             ReloadMaps();
             InitIRC();
         }
@@ -158,8 +176,7 @@ namespace OsuSqlTool
                     foreach (var m in maps[(int)ladder]
                         .Where(o => o.Category == e))
                     {
-                        var mapControl = new MapControl();
-                        mapControl.DataContext = m;
+                        var mapControl = new MapControl(m);
                         mapControl.Picked += MapControl_Picked;
                         mapControl.Banned += MapControl_Banned;
                         wrapPanel.Children.Add(mapControl);
