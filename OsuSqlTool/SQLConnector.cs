@@ -58,8 +58,8 @@ namespace OsuSqlTool
 
         public void Connect()
         {
-            if (string.IsNullOrWhiteSpace(Settings.Username)
-                || string.IsNullOrWhiteSpace(Settings.Password))
+            if (string.IsNullOrWhiteSpace(Settings.Instance.Username)
+                || string.IsNullOrWhiteSpace(Settings.Instance.Password))
             {
                 Disconnected(this, EventArgs.Empty);
             }
@@ -67,10 +67,10 @@ namespace OsuSqlTool
             {
                 client.Connect("irc.ppy.sh", 6667, false, new IrcUserRegistrationInfo()
                 {
-                    NickName = Settings.Username,
-                    Password = Settings.Password,
-                    UserName = Settings.Username,
-                    RealName = Settings.Username,
+                    NickName = Settings.Instance.Username,
+                    Password = Settings.Instance.Password,
+                    UserName = Settings.Instance.Username,
+                    RealName = Settings.Instance.Username,
                 });
             }
         }
@@ -142,7 +142,7 @@ namespace OsuSqlTool
 
         private void Client_MotdReceived(object sender, EventArgs e)
         {
-            client.LocalUser.SendMessage("osu_SQL", "!rank");
+            client.LocalUser.SendMessage("osu_SQL", "!help");
         }
 
         private void LocalUser_MessageReceived(object sender, IrcMessageEventArgs e)

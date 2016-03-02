@@ -34,7 +34,17 @@ namespace OsuSqlTool
             SQL = new SQLConnector();
             SQL.Disconnected += Sql_Disconnected;
 
+            Settings.Instance.PropertyChanged += Instance_PropertyChanged;
+
             InitializeComponent();
+        }
+
+        private void Instance_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Ladder")
+            {
+                CallPropertyChanged("CurrentLadderMaps");
+            }
         }
 
         public SQLConnector SQL { get; private set; }
@@ -43,13 +53,13 @@ namespace OsuSqlTool
         {
             get
             {
-                return SQL.Maps.GetLadderMaps(Settings.Ladder)
+                return SQL.Maps.GetLadderMaps(Settings.Instance.Ladder)
                     .GroupBy(o => o.Category)
                     .Select(o => new SQLCategoryMaps(o, o.Key));
             }
         }
 
-        private void CallPropertChanged(string name)
+        private void CallPropertyChanged(string name)
         {
             PropertyChanged(this, new PropertyChangedEventArgs(name));
         }
@@ -66,8 +76,6 @@ namespace OsuSqlTool
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            ladderCombo.SelectedValue = Settings.Ladder;
-
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
                 CheckUpdate();
@@ -98,14 +106,14 @@ namespace OsuSqlTool
             Dispatcher.Invoke(() =>
             {
                 var loginDialog = new LoginDialog();
-                loginDialog.Username = Settings.Username;
-                loginDialog.Password = Settings.Password;
+                loginDialog.Username = Settings.Instance.Username;
+                loginDialog.Password = Settings.Instance.Password;
                 var res = loginDialog.ShowDialog();
                 if (res.HasValue && res.Value)
                 {
-                    Settings.Username = loginDialog.Username;
-                    Settings.Password = loginDialog.Password;
-                    Settings.Save();
+                    Settings.Instance.Username = loginDialog.Username;
+                    Settings.Instance.Password = loginDialog.Password;
+                    Settings.Instance.Save();
                     SQL.Connect();
                 }
                 else
@@ -118,27 +126,22 @@ namespace OsuSqlTool
         private void ReloadMaps()
         {
             SQL.Maps.ReloadMaps();
-            CallPropertChanged("CurrentLadderMaps");
-        }
-
-        private void ladderCombo_Selected(object sender, RoutedEventArgs e)
-        {
-            if (ladderCombo.SelectedValue != null
-                && SQL.IsReady)
-            {
-                Settings.Ladder = (SQLLadder)ladderCombo.SelectedValue;
-                Settings.Save();
-                CallPropertChanged("CurrentLadderMaps");
-            }
+            CallPropertyChanged("CurrentLadderMaps");
         }
 
         private void ForgetLogin_Click(object sender, RoutedEventArgs e)
         {
-            Settings.Username = "";
-            Settings.Password = "";
-            Settings.Save();
+            Settings.Instance.Username = "";
+            Settings.Instance.Password = "";
+            Settings.Instance.Save();
 
             SQL.Disconnect();
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var option = new OptionsDialog();
+            option.ShowDialog();
         }
     }
 }

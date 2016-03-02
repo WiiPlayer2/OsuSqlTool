@@ -49,10 +49,7 @@ namespace OsuSqlTool
 
                 AreMapsLoaded = true;
             }
-            catch (Exception e)
-            {
-
-            }
+            catch { }
         }
 
         public IEnumerable<SQLMap> GetLadderMaps(SQLLadder ladder)

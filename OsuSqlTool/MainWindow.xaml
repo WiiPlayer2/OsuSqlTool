@@ -8,33 +8,29 @@
         x:Name="root"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         IsEnabled="{Binding SQL.IsReady}"
-        Title="osu!SQL Tool" Height="600" Width="800">
+        Title="osu!SQL Tool" Height="600" Width="800" Icon="osu_tool.png">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition />
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" Margin="5">
-            <ComboBox SelectedIndex="0" x:Name="ladderCombo" SelectionChanged="ladderCombo_Selected">
-                <local:SQLLadder>Beginner</local:SQLLadder>
-                <local:SQLLadder>Standard</local:SQLLadder>
-                <local:SQLLadder>Expert</local:SQLLadder>
-            </ComboBox>
+        <Menu>
+            <MenuItem Header="Settings">
+                <MenuItem Header="Reload Maps" Click="Reload_Click" />
+                <Separator />
+                <MenuItem Header="Forget IRC Login" Click="ForgetLogin_Click" />
+                <MenuItem Header="Settings" Click="MenuItem_Click" />
+            </MenuItem>
+            <MenuItem Header="?" />
+        </Menu>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5">
             <TextBlock VerticalAlignment="Center" Margin="5,0,5,0">
                 Scale:
             </TextBlock>
             <Slider x:Name="scaleSlider" Width="200" Margin="5,0,5,0" Minimum="0.5" Maximum="2" Value="1" />
         </StackPanel>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Width="Auto" Height="Auto" Margin="5" Click="ForgetLogin_Click">
-                Forget IRC Login
-            </Button>
-            <Button Click="Reload_Click" Width="Auto" Height="Auto"
-                HorizontalAlignment="Right" Margin="5">
-                Reload Maps
-            </Button>
-        </StackPanel>
-        <ScrollViewer Grid.Row="1">
+        <ScrollViewer Grid.Row="2">
             <ScrollViewer.LayoutTransform>
                 <ScaleTransform CenterX="0" CenterY="0"
                                 ScaleX="{Binding ElementName=scaleSlider, Path=Value}" ScaleY="{Binding ElementName=scaleSlider, Path=Value}"/>
@@ -43,8 +39,8 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Vertical">
-                            <TextBlock FontSize="20" Text="{Binding Category}" />
-                            <ItemsControl ItemsSource="{Binding Maps}">
+                            <TextBlock FontSize="20" Text="{Binding Category}" Margin="10,10,5,0" />
+                            <ItemsControl ItemsSource="{Binding Maps}" Margin="5,0,0,0">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <WrapPanel />

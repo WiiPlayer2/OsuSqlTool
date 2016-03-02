@@ -39,12 +39,6 @@ namespace OsuSqlTool
             set
             {
                 DataContext = value;
-                if (value.Category == SQLCategory.Tiebreaker)
-                {
-                    pickButton.Visibility = Visibility.Collapsed;
-                    banButton.Visibility = Visibility.Collapsed;
-                }
-
                 SetValue(MapProperty, value);
             }
         }
@@ -63,6 +57,20 @@ namespace OsuSqlTool
         private void Pick_Click(object sender, RoutedEventArgs e)
         {
             SQL.Pick(Map);
+        }
+
+        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            base.OnPropertyChanged(e);
+
+            if (e.Property == MapProperty)
+            {
+                if (Map.Category == SQLCategory.Tiebreaker)
+                {
+                    pickButton.Visibility = Visibility.Collapsed;
+                    banButton.Visibility = Visibility.Collapsed;
+                }
+            }
         }
     }
 }
