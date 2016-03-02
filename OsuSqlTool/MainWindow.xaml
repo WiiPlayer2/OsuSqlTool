@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OsuSqlTool"
         mc:Ignorable="d" Loaded="Window_Loaded"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        IsEnabled="{Binding SQL.IsReady}"
         Title="osu!SQL Tool" Height="600" Width="800">
     <Grid>
         <Grid.RowDefinitions>

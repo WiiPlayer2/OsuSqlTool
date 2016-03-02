@@ -36,9 +36,18 @@ namespace OsuSqlTool
 
         public MainWindow()
         {
-            InitializeComponent();
-
             web = new WebClient();
+            SQL = new SQLConnector();
+            SQL.Disconnected += Sql_Disconnected;
+
+            InitializeComponent();
+        }
+
+        public SQLConnector SQL { get; private set; }
+
+        private void Sql_Disconnected(object sender, EventArgs e)
+        {
+            ShowLoginDialog();
         }
 
         private void Reload_Click(object sender, RoutedEventArgs e)
@@ -48,7 +57,7 @@ namespace OsuSqlTool
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            ladderCombo.SelectedValue = Settings.Default.Ladder;
+            ladderCombo.SelectedValue = Settings.Ladder;
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
                 Update.Init("WiiPlayer2", "OsuSqlTool");
@@ -65,62 +74,23 @@ namespace OsuSqlTool
                 }
             }
             ReloadMaps();
-            InitIRC();
+            SQL.Connect();
         }
 
-        private void InitIRC()
-        {
-            osuSqlUser = null;
-            Dispatcher.Invoke(() =>
-            {
-                IsEnabled = false;
-            });
-
-            client = new OsuIrcClient();
-            client.Connected += Client_Connected;
-            client.ConnectFailed += Client_ConnectFailed;
-            client.Disconnected += Client_Disconnected;
-            var reg = new IrcUserRegistrationInfo()
-            {
-                NickName = Settings.Default.Username,
-                UserName = Settings.Default.Username,
-                Password = Settings.Default.Password,
-                RealName = Settings.Default.Username,
-            };
-            try
-            {
-                if (string.IsNullOrWhiteSpace(reg.NickName)
-                    || string.IsNullOrWhiteSpace(reg.Password))
-                {
-                    throw new ArgumentException();
-                }
-                client.Connect("irc.ppy.sh", 6667, false, reg);
-            }
-            catch (Exception e)
-            {
-                Client_ConnectFailed(client, new IrcErrorEventArgs(e));
-            }
-        }
-
-        private void Client_Disconnected(object sender, EventArgs e)
-        {
-            Client_ConnectFailed(sender, new IrcErrorEventArgs(new Exception()));
-        }
-
-        private void Client_ConnectFailed(object sender, IrcErrorEventArgs e)
+        private void ShowLoginDialog()
         {
             Dispatcher.Invoke(() =>
             {
                 var loginDialog = new LoginDialog();
-                loginDialog.Username = Settings.Default.Username;
-                loginDialog.Password = Settings.Default.Password;
+                loginDialog.Username = Settings.Username;
+                loginDialog.Password = Settings.Password;
                 var res = loginDialog.ShowDialog();
                 if (res.HasValue && res.Value)
                 {
-                    Settings.Default.Username = loginDialog.Username;
-                    Settings.Default.Password = loginDialog.Password;
-                    Settings.Default.Save();
-                    InitIRC();
+                    Settings.Username = loginDialog.Username;
+                    Settings.Password = loginDialog.Password;
+                    Settings.Save();
+                    SQL.Connect();
                 }
                 else
                 {
@@ -143,17 +113,6 @@ namespace OsuSqlTool
                     });
                 }
             }
-        }
-
-        private void Client_Connected(object sender, EventArgs e)
-        {
-            client.LocalUser.MessageReceived += LocalUser_MessageReceived;
-            client.MotdReceived += Client_MotdReceived;
-        }
-
-        private void Client_MotdReceived(object sender, EventArgs e)
-        {
-            client.LocalUser.SendMessage("osu_SQL", "!rank");
         }
 
         private void ShowMaps()
@@ -187,29 +146,12 @@ namespace OsuSqlTool
 
         private void MapControl_Banned(object sender, RoutedEventArgs e)
         {
-            MapCommand(sender, "ban");
+            SQL.Ban((sender as MapControl).Map);
         }
 
         private void MapControl_Picked(object sender, RoutedEventArgs e)
         {
-            MapCommand(sender, "pick");
-        }
-
-        private void MapCommand(object sender, string command)
-        {
-            if (osuSqlUser != null)
-            {
-                try
-                {
-                    var mapControl = sender as MapControl;
-                    var map = mapControl.DataContext as SQLMap;
-                    client.LocalUser.SendMessage(osuSqlUser, string.Format("!{0} {1}", command, map.MapIndex));
-                }
-                catch (Exception e)
-                {
-
-                }
-            }
+            SQL.Pick((sender as MapControl).Map);
         }
 
         private void ReloadMaps()
@@ -241,18 +183,19 @@ namespace OsuSqlTool
             if (ladderCombo.SelectedValue != null
                 && osuSqlUser != null)
             {
-                Settings.Default.Ladder = (SQLLadder)ladderCombo.SelectedValue;
-                Settings.Default.Save();
+                Settings.Ladder = (SQLLadder)ladderCombo.SelectedValue;
+                Settings.Save();
             }
             ShowMaps();
         }
 
         private void ForgetLogin_Click(object sender, RoutedEventArgs e)
         {
-            Settings.Default.Username = "";
-            Settings.Default.Password = "";
-            Settings.Default.Save();
-            client.Disconnect();
+            Settings.Username = "";
+            Settings.Password = "";
+            Settings.Save();
+
+            SQL.Disconnect();
         }
     }
 }
