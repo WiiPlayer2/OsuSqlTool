@@ -13,51 +13,12 @@ namespace OsuSqlTool
 {
     public class Settings : DependencyObject, INotifyPropertyChanged
     {
-        #region Public Constructors
+        private IniFile ini;
 
         static Settings()
         {
             Instance = new Settings();
         }
-
-        #endregion Public Constructors
-
-        #region Public Properties
-
-        public static Settings Instance { get; private set; }
-        public string SettingsFile { get; private set; }
-
-        #endregion Public Properties
-
-        #region Public Methods
-
-        public void Reload()
-        {
-            ini = new IniFile();
-            ini.Load(SettingsFile);
-            Load();
-        }
-
-        public void Save()
-        {
-            var keys = ini.Sections["General"].Keys;
-
-            keys["username"].Value = Username;
-            keys["password"].Value = Password;
-            keys["ladder"].Value = Ladder.ToString();
-
-            ini.Save(SettingsFile);
-        }
-
-        #endregion Public Methods
-
-        #region Private Fields
-
-        private IniFile ini;
-
-        #endregion Private Fields
-
-        #region Private Constructors
 
         private Settings()
         {
@@ -71,25 +32,59 @@ namespace OsuSqlTool
                 ini.Load(SettingsFile);
             }
 
-            SetDefault("General", "username", "");
-            SetDefault("General", "password", "");
-            SetDefault("General", "ladder", SQLLadder.Beginner);
+            SetDefault("General", "Username", "");
+            SetDefault("General", "Password", "");
+            SetDefault("General", "Ladder", SQLLadder.Beginner);
+            SetDefault("General", "UseNotificationSound", true);
+            SetDefault("General", "NotificationSoundUri", "file://");
 
             ini.Save(SettingsFile);
 
             Load();
         }
 
-        #endregion Private Constructors
+        public event PropertyChangedEventHandler PropertyChanged = (s, e) => { };
+
+        public static Settings Instance { get; private set; }
+
+        public string SettingsFile { get; private set; }
+
+        public void Reload()
+        {
+            ini = new IniFile();
+            ini.Load(SettingsFile);
+            Load();
+        }
+
+        public void Save()
+        {
+            var keys = ini.Sections["General"].Keys;
+
+            keys["Username"].Value = Username;
+            keys["Password"].Value = Password;
+            keys["Ladder"].Value = Ladder.ToString();
+            keys["UseNotificationSound"].Value = UseNotificationSound.ToString();
+            keys["NotificationSoundUri"].Value = NotificationSoundUri.ToString();
+
+            ini.Save(SettingsFile);
+        }
 
         #region Values
         // Using a DependencyProperty as the backing store for Ladder.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty LadderProperty =
             DependencyProperty.Register("Ladder", typeof(SQLLadder), typeof(Settings), new PropertyMetadata(SQLLadder.Beginner));
 
+        // Using a DependencyProperty as the backing store for NotificationSoundUri.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty NotificationSoundUriProperty =
+            DependencyProperty.Register("NotificationSoundUri", typeof(Uri), typeof(Settings), new PropertyMetadata(new Uri("file://")));
+
         // Using a DependencyProperty as the backing store for Password.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty PasswordProperty =
             DependencyProperty.Register("Password", typeof(string), typeof(Settings), new PropertyMetadata(""));
+
+        // Using a DependencyProperty as the backing store for UseNotificationSound.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty UseNotificationSoundProperty =
+            DependencyProperty.Register("UseNotificationSound", typeof(bool?), typeof(Settings), new PropertyMetadata(true));
 
         // Using a DependencyProperty as the backing store for Username.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty UsernameProperty =
@@ -101,10 +96,22 @@ namespace OsuSqlTool
             set { SetValue(LadderProperty, value); }
         }
 
+        public Uri NotificationSoundUri
+        {
+            get { return (Uri)GetValue(NotificationSoundUriProperty); }
+            set { SetValue(NotificationSoundUriProperty, value); }
+        }
+
         public string Password
         {
             get { return (string)GetValue(PasswordProperty); }
             set { SetValue(PasswordProperty, value); }
+        }
+
+        public bool? UseNotificationSound
+        {
+            get { return (bool)GetValue(UseNotificationSoundProperty); }
+            set { SetValue(UseNotificationSoundProperty, value); }
         }
 
         public string Username
@@ -112,12 +119,16 @@ namespace OsuSqlTool
             get { return (string)GetValue(UsernameProperty); }
             set { SetValue(UsernameProperty, value); }
         }
-        #endregion
+        #endregion Values
 
-        #region Private Methods
+        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            base.OnPropertyChanged(e);
+            PropertyChanged(this, new PropertyChangedEventArgs(e.Property.Name));
+        }
 
         private static TEnum ParseEnum<TEnum>(string value)
-            where TEnum : struct
+                    where TEnum : struct
         {
             TEnum val = default(TEnum);
             Enum.TryParse<TEnum>(value, out val);
@@ -128,19 +139,11 @@ namespace OsuSqlTool
         {
             var keys = ini.Sections["General"].Keys;
 
-            Username = keys["username"].Value;
-            Password = keys["password"].Value;
-            Ladder = ParseEnum<SQLLadder>(keys["ladder"].Value);
-        }
-
-        #endregion Private Methods
-
-        public event PropertyChangedEventHandler PropertyChanged = (s, e) => { };
-
-        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
-        {
-            base.OnPropertyChanged(e);
-            PropertyChanged(this, new PropertyChangedEventArgs(e.Property.Name));
+            Username = keys["Username"].Value;
+            Password = keys["Password"].Value;
+            Ladder = ParseEnum<SQLLadder>(keys["Ladder"].Value);
+            UseNotificationSound = keys["UseNotificationSound"].Value.ToLower() == "true";
+            NotificationSoundUri = new Uri(keys["NotificationSoundUri"].Value);
         }
 
         private void SetDefault(string section, string name)

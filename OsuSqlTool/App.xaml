@@ -14,5 +14,9 @@
         <Binding x:Key="usernameSetting" Source="{x:Static local:Settings.Instance}" Path="Username" />
         <Binding x:Key="passwordSetting" Source="{x:Static local:Settings.Instance}" Path="Password" />
         <Binding x:Key="ladderSetting" Source="{x:Static local:Settings.Instance}" Path="Ladder" />
+        <Binding x:Key="useNotificationSetting" Source="{x:Static local:Settings.Instance}"
+                 Path="UseNotificationSound" />
+        <Binding x:Key="notificationUriSetting" Source="{x:Static local:Settings.Instance}"
+                 Path="NotificationSoundUri" />
     </Application.Resources>
 </Application>

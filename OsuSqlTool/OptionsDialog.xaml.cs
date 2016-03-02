@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,11 +34,30 @@ namespace OsuSqlTool
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Ok_Click(object sender, RoutedEventArgs e)
         {
             Settings.Instance.Save();
             DialogResult = true;
             Close();
+        }
+
+        private void SelectNotificationSoundFile_Click(object sender, RoutedEventArgs e)
+        {
+            var f = new OpenFileDialog()
+            {
+                Filter = "All Files (*.*)|*.*",
+            };
+
+            var res = f.ShowDialog();
+            if (res.HasValue && res.Value)
+            {
+                Settings.Instance.NotificationSoundUri = new Uri(f.FileName);
+            }
+        }
+
+        private void TestNotificationSound_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

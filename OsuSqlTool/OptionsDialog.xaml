@@ -38,14 +38,21 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <CheckBox>Play a notification sound if a match is found</CheckBox>
-                    <StackPanel Grid.Row="1" Orientation="Horizontal">
+                    <CheckBox IsChecked="{Binding UseNotificationSound}">
+                        Play a notification sound if a match is found
+                    </CheckBox>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" IsEnabled="{Binding UseNotificationSound}">
                         <Label>Soundfile:</Label>
-                        <TextBox IsReadOnly="True" Width="200" VerticalContentAlignment="Center" />
-                        <Button>
+                        <TextBox IsReadOnly="True" Width="200" VerticalContentAlignment="Center"
+                                 Text="{Binding NotificationSoundUri}">
+                            <TextBox.Background>
+                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlDarkColorKey}}"/>
+                            </TextBox.Background>
+                        </TextBox>
+                        <Button Click="SelectNotificationSoundFile_Click">
                             Sel.
                         </Button>
-                        <Button>
+                        <Button Click="TestNotificationSound_Click">
                             Test
                         </Button>
                     </StackPanel>
@@ -53,7 +60,7 @@
             </TabItem>
         </TabControl>
         <Button Grid.Row="1" Width="75" Height="25" HorizontalAlignment="Right" Margin="10"
-                Click="Button_Click">
+                Click="Ok_Click">
             Ok
         </Button>
     </Grid>
