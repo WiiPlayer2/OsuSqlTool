@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OsuSqlTool"
-             mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:SQLMap, IsDesignTimeCreatable=True}"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=local:SQLMap, IsDesignTimeCreatable=True}"
              Width="200" Height="150" Foreground="White" Margin="2.5">
     <Grid>
         <Image Source="{Binding MapSetThumbnailURL}" Stretch="UniformToFill" />

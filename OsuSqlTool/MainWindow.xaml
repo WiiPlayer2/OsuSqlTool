@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OsuSqlTool"
         mc:Ignorable="d" Loaded="Window_Loaded"
+        x:Name="root"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         IsEnabled="{Binding SQL.IsReady}"
         Title="osu!SQL Tool" Height="600" Width="800">
@@ -38,16 +39,27 @@
                 <ScaleTransform CenterX="0" CenterY="0"
                                 ScaleX="{Binding ElementName=scaleSlider, Path=Value}" ScaleY="{Binding ElementName=scaleSlider, Path=Value}"/>
             </ScrollViewer.LayoutTransform>
-            <StackPanel x:Name="mapPanel">
-                <TextBlock FontSize="20">
-                    No Mod
-                </TextBlock>
-                <WrapPanel>
-                    <local:MapControl />
-                    <local:MapControl />
-                    <local:MapControl />
-                </WrapPanel>
-            </StackPanel>
+            <ItemsControl ItemsSource="{Binding CurrentLadderMaps}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock FontSize="20" Text="{Binding Category}" />
+                            <ItemsControl ItemsSource="{Binding Maps}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <local:MapControl Map="{Binding}" SQL="{Binding SQL, ElementName=root}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </ScrollViewer>
     </Grid>
 </Window>

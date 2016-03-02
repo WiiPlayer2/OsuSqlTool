@@ -20,63 +20,49 @@ namespace OsuSqlTool
     /// </summary>
     public partial class MapControl : UserControl
     {
-        public static readonly RoutedEvent PickedEvent = EventManager.RegisterRoutedEvent(
-            "Picked", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(MapControl));
-        public static readonly RoutedEvent BannedEvent = EventManager.RegisterRoutedEvent(
-            "Banned", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(MapControl));
+        // Using a DependencyProperty as the backing store for Map.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty MapProperty =
+            DependencyProperty.Register("Map", typeof(SQLMap), typeof(MapControl), new PropertyMetadata(null));
+
+        // Using a DependencyProperty as the backing store for SQL.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SQLProperty =
+            DependencyProperty.Register("SQL", typeof(SQLConnector), typeof(MapControl), new PropertyMetadata(null));
 
         public MapControl()
         {
             InitializeComponent();
         }
 
-        public MapControl(SQLMap map)
-            : this()
+        public SQLMap Map
         {
-            Map = map;
-            DataContext = map;
-
-            if (map.Category == SQLCategory.Tiebreaker)
+            get { return (SQLMap)GetValue(MapProperty); }
+            set
             {
-                pickButton.Visibility = Visibility.Collapsed;
-                banButton.Visibility = Visibility.Collapsed;
+                DataContext = value;
+                if (value.Category == SQLCategory.Tiebreaker)
+                {
+                    pickButton.Visibility = Visibility.Collapsed;
+                    banButton.Visibility = Visibility.Collapsed;
+                }
+
+                SetValue(MapProperty, value);
             }
         }
 
-        public event RoutedEventHandler Picked
+        public SQLConnector SQL
         {
-            add
-            {
-                AddHandler(PickedEvent, value);
-            }
-            remove
-            {
-                RemoveHandler(PickedEvent, value);
-            }
-        }
-
-        public event RoutedEventHandler Banned
-        {
-            add
-            {
-                AddHandler(BannedEvent, value);
-            }
-            remove
-            {
-                RemoveHandler(BannedEvent, value);
-            }
-        }
-
-        public SQLMap Map { get; private set; }
-
-        private void Pick_Click(object sender, RoutedEventArgs e)
-        {
-            RaiseEvent(new RoutedEventArgs(PickedEvent));
+            get { return (SQLConnector)GetValue(SQLProperty); }
+            set { SetValue(SQLProperty, value); }
         }
 
         private void Ban_Click(object sender, RoutedEventArgs e)
         {
-            RaiseEvent(new RoutedEventArgs(BannedEvent));
+            SQL.Ban(Map);
+        }
+
+        private void Pick_Click(object sender, RoutedEventArgs e)
+        {
+            SQL.Pick(Map);
         }
     }
 }

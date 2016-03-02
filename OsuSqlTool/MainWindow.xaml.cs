@@ -25,18 +25,12 @@ namespace OsuSqlTool
     /// <summary>
     /// Interaktionslogik für MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        public const string API_URL = "http://osusql.com/mappools.json";
-
-        private WebClient web;
-        private SQLMap[][] maps;
-        private StandardIrcClient client;
-        private IrcUser osuSqlUser;
+        public event PropertyChangedEventHandler PropertyChanged = (s, e) => { };
 
         public MainWindow()
         {
-            web = new WebClient();
             SQL = new SQLConnector();
             SQL.Disconnected += Sql_Disconnected;
 
@@ -44,6 +38,21 @@ namespace OsuSqlTool
         }
 
         public SQLConnector SQL { get; private set; }
+
+        public IEnumerable<SQLCategoryMaps> CurrentLadderMaps
+        {
+            get
+            {
+                return SQL.Maps.GetLadderMaps(Settings.Ladder)
+                    .GroupBy(o => o.Category)
+                    .Select(o => new SQLCategoryMaps(o, o.Key));
+            }
+        }
+
+        private void CallPropertChanged(string name)
+        {
+            PropertyChanged(this, new PropertyChangedEventArgs(name));
+        }
 
         private void Sql_Disconnected(object sender, EventArgs e)
         {
@@ -58,23 +67,30 @@ namespace OsuSqlTool
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             ladderCombo.SelectedValue = Settings.Ladder;
+
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                Update.Init("WiiPlayer2", "OsuSqlTool");
-                if (Update.HasUpdate())
-                {
-                    var res = MessageBox.Show(
-                        string.Format("There is a newer version available at {0} \n(Current version: {1}; Newer version: {2})\n\nDo you want to download it now?",
-                        Update.ReleaseUrl, Update.CurrentVersion, Update.NewestVersion), "Update available!",
-                        MessageBoxButton.YesNo, MessageBoxImage.Information);
-                    if (res == MessageBoxResult.Yes)
-                    {
-                        Process.Start(Update.ReleaseUrl);
-                    }
-                }
+                CheckUpdate();
             }
+
             ReloadMaps();
             SQL.Connect();
+        }
+
+        private void CheckUpdate()
+        {
+            Update.Init("WiiPlayer2", "OsuSqlTool");
+            if (Update.HasUpdate())
+            {
+                var res = MessageBox.Show(
+                    string.Format("There is a newer version available at {0} \n(Current version: {1}; Newer version: {2})\n\nDo you want to download it now?",
+                    Update.ReleaseUrl, Update.CurrentVersion, Update.NewestVersion), "Update available!",
+                    MessageBoxButton.YesNo, MessageBoxImage.Information);
+                if (res == MessageBoxResult.Yes)
+                {
+                    Process.Start(Update.ReleaseUrl);
+                }
+            }
         }
 
         private void ShowLoginDialog()
@@ -99,94 +115,21 @@ namespace OsuSqlTool
             });
         }
 
-        private void LocalUser_MessageReceived(object sender, IrcMessageEventArgs e)
-        {
-            if (e.Source.Name == "osu_SQL")
-            {
-                if (osuSqlUser == null)
-                {
-                    var type = e.Source.GetType();
-                    osuSqlUser = e.Source as IrcUser;
-                    Dispatcher.Invoke(() =>
-                    {
-                        IsEnabled = true;
-                    });
-                }
-            }
-        }
-
-        private void ShowMaps()
-        {
-            if (maps != null)
-            {
-                var ladder = (SQLCategory)ladderCombo.SelectedValue;
-                mapPanel.Children.Clear();
-                foreach (var e in Enum.GetValues(typeof(SQLCategory))
-                    .Cast<SQLCategory>())
-                {
-                    var text = new TextBlock();
-                    text.Text = e.ToString();
-                    text.FontSize = 20;
-
-                    mapPanel.Children.Add(text);
-                    var wrapPanel = new WrapPanel();
-                    mapPanel.Children.Add(wrapPanel);
-
-                    foreach (var m in maps[(int)ladder]
-                        .Where(o => o.Category == e))
-                    {
-                        var mapControl = new MapControl(m);
-                        mapControl.Picked += MapControl_Picked;
-                        mapControl.Banned += MapControl_Banned;
-                        wrapPanel.Children.Add(mapControl);
-                    }
-                }
-            }
-        }
-
-        private void MapControl_Banned(object sender, RoutedEventArgs e)
-        {
-            SQL.Ban((sender as MapControl).Map);
-        }
-
-        private void MapControl_Picked(object sender, RoutedEventArgs e)
-        {
-            SQL.Pick((sender as MapControl).Map);
-        }
-
         private void ReloadMaps()
         {
-            try
-            {
-                var mapJson = web.DownloadString(API_URL);
-                maps = JsonConvert.DeserializeObject<SQLMap[][]>(mapJson);
-
-                for (var i = 0; i < 3; i++)
-                {
-                    for (var j = 0; j < maps[i].Length; j++)
-                    {
-                        maps[i][j].Ladder = (SQLLadder)i;
-                        maps[i][j].MapIndex = j + 1;
-                    }
-                }
-
-                ShowMaps();
-            }
-            catch (Exception e)
-            {
-
-            }
+            SQL.Maps.ReloadMaps();
+            CallPropertChanged("CurrentLadderMaps");
         }
 
         private void ladderCombo_Selected(object sender, RoutedEventArgs e)
         {
             if (ladderCombo.SelectedValue != null
-                && osuSqlUser != null)
+                && SQL.IsReady)
             {
                 Settings.Ladder = (SQLLadder)ladderCombo.SelectedValue;
                 Settings.Save();
+                CallPropertChanged("CurrentLadderMaps");
             }
-            ShowMaps();
         }
 
         private void ForgetLogin_Click(object sender, RoutedEventArgs e)
