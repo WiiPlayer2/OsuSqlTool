@@ -96,6 +96,9 @@
       <DependentUpon>OptionsDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="OsuIrcClient.cs" />
+    <Compile Include="QueueElement.xaml.cs">
+      <DependentUpon>QueueElement.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Settings.cs" />
     <Compile Include="SQLCategory.cs" />
     <Compile Include="SQLCategoryMaps.cs" />
@@ -103,6 +106,7 @@
     <Compile Include="SQLLadder.cs" />
     <Compile Include="SQLMap.cs" />
     <Compile Include="SQLMapDownloader.cs" />
+    <Compile Include="SQLState.cs" />
     <Page Include="AboutDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -129,6 +133,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="OptionsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="QueueElement.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

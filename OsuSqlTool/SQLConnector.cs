@@ -12,6 +12,7 @@ namespace OsuSqlTool
     public class SQLConnector : INotifyPropertyChanged
     {
         private OsuIrcClient client;
+        private SQLState currentState = SQLState.Unqueued;
         private IrcUser osuSqlUser;
         private Dictionary<Regex, Action<Match>> regexActions;
 
@@ -29,6 +30,7 @@ namespace OsuSqlTool
             RegisterAction("^A match was found!.*$", ChatMatchFound);
             RegisterAction("^You're queued up!.*$", ChatQueuedUp);
             RegisterAction("^You failed to ready up in time!$", ChatReadyFailed);
+            RegisterAction("^You're no longer searching for a match!$", ChatUnqueued);
         }
 
         public event EventHandler Disconnected = (s, e) => { };
@@ -37,6 +39,25 @@ namespace OsuSqlTool
 
         public event PropertyChangedEventHandler PropertyChanged = (s, e) => { };
 
+        public event EventHandler Queued = (s, e) => { };
+
+        public event EventHandler Unqueued = (s, e) => { };
+        public SQLState CurrentState
+        {
+            get
+            {
+                return currentState;
+            }
+            private set
+            {
+                if (currentState != value)
+                {
+                    currentState = value;
+                    CallPropertyChanged("CurrentState");
+                }
+            }
+        }
+
         public bool IsReady
         {
             get
@@ -44,7 +65,6 @@ namespace OsuSqlTool
                 return osuSqlUser != null;
             }
         }
-
         public SQLMapDownloader Maps { get; private set; }
 
         public void Ban(SQLMap map)
@@ -109,17 +129,26 @@ namespace OsuSqlTool
         #region ChatActions
         private void ChatMatchFound(Match obj)
         {
+            CurrentState = SQLState.MatchFound;
             MatchFound(this, EventArgs.Empty);
         }
 
         private void ChatQueuedUp(Match obj)
         {
-            //throw new NotImplementedException();
+            CurrentState = SQLState.Queued;
+            Queued(this, EventArgs.Empty);
         }
 
         private void ChatReadyFailed(Match obj)
         {
-            //throw new NotImplementedException();
+            CurrentState = SQLState.Unqueued;
+            Unqueued(this, EventArgs.Empty);
+        }
+
+        private void ChatUnqueued(Match obj)
+        {
+            CurrentState = SQLState.Unqueued;
+            Unqueued(this, EventArgs.Empty);
         }
         #endregion
 

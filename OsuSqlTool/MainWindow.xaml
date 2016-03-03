@@ -34,7 +34,8 @@
         <ScrollViewer Grid.Row="2">
             <ScrollViewer.LayoutTransform>
                 <ScaleTransform CenterX="0" CenterY="0"
-                                ScaleX="{Binding ElementName=scaleSlider, Path=Value}" ScaleY="{Binding ElementName=scaleSlider, Path=Value}"/>
+                                ScaleX="{Binding ElementName=scaleSlider, Path=Value}"
+                                ScaleY="{Binding ElementName=scaleSlider, Path=Value}"/>
             </ScrollViewer.LayoutTransform>
             <ItemsControl ItemsSource="{Binding CurrentLadderMaps}">
                 <ItemsControl.ItemTemplate>
@@ -58,5 +59,19 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
+        <Button x:Name="queueButton" Grid.Row="2" Width="100" Height="100" Margin="30"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                Foreground="White" Click="Queue_Click" Background="{StaticResource queueColor}">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Ellipse Fill="{TemplateBinding Background}" />
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          Content="{TemplateBinding Content}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Button.Template>
+            Queue
+        </Button>
     </Grid>
 </Window>

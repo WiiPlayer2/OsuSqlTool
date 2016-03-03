@@ -34,10 +34,38 @@ namespace OsuSqlTool
             SQL = new SQLConnector();
             SQL.Disconnected += Sql_Disconnected;
             SQL.MatchFound += SQL_MatchFound;
+            SQL.PropertyChanged += SQL_PropertyChanged;
 
             Settings.Instance.PropertyChanged += Instance_PropertyChanged;
 
             InitializeComponent();
+        }
+
+        private void SQL_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "CurrentState")
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    queueButton.IsEnabled = true;
+                    queueButton.Opacity = 0.7;
+                    switch (SQL.CurrentState)
+                    {
+                        case SQLState.Unqueued:
+                            queueButton.Content = "Queue";
+                            queueButton.Background = FindResource("queueColor") as Brush;
+                            break;
+                        case SQLState.Queued:
+                            queueButton.Content = "Unqueue";
+                            queueButton.Background = FindResource("unqueueColor") as Brush;
+                            break;
+                        case SQLState.MatchFound:
+                            queueButton.Content = "Ready Up";
+                            queueButton.Background = FindResource("readyColor") as Brush;
+                            break;
+                    }
+                });
+            }
         }
 
         private void SQL_MatchFound(object sender, EventArgs e)
@@ -101,7 +129,8 @@ namespace OsuSqlTool
             if (Update.HasUpdate())
             {
                 var res = MessageBox.Show(
-                    string.Format("There is a newer version available at {0} \n(Current version: {1}; Newer version: {2})\n\nDo you want to download it now?",
+                    string.Format("There is a newer version available at {0} \n(Current version: {1}; Newer version: {2})\n\n"
+                        + "Do you want to download it now?",
                     Update.ReleaseUrl, Update.CurrentVersion, Update.NewestVersion), "Update available!",
                     MessageBoxButton.YesNo, MessageBoxImage.Information);
                 if (res == MessageBoxResult.Yes)
@@ -158,6 +187,24 @@ namespace OsuSqlTool
         {
             var about = new AboutDialog();
             about.ShowDialog();
+        }
+
+        private void Queue_Click(object sender, RoutedEventArgs e)
+        {
+            queueButton.IsEnabled = false;
+            queueButton.Opacity = 0;
+            switch (SQL.CurrentState)
+            {
+                case SQLState.Unqueued:
+                    SQL.Queue(Settings.Instance.Ladder);
+                    break;
+                case SQLState.Queued:
+                    SQL.Unqueue();
+                    break;
+                case SQLState.MatchFound:
+                    SQL.Ready();
+                    break;
+            }
         }
     }
 }
