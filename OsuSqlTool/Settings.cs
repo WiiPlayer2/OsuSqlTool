@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -17,7 +19,14 @@ namespace OsuSqlTool
 
         static Settings()
         {
-            Instance = new Settings();
+            try
+            {
+                Instance = new Settings();
+            }
+            catch (Exception e)
+            {
+                Debug.Fail(e.Message, e.ToString());
+            }
         }
 
         private Settings()
@@ -37,6 +46,7 @@ namespace OsuSqlTool
             SetDefault("General", "Ladder", SQLLadder.Beginner);
             SetDefault("General", "UseNotificationSound", true);
             SetDefault("General", "NotificationSoundUri", "file://");
+            SetDefault("General", "NotificationVolume", 1.0d);
 
             ini.Save(SettingsFile);
 
@@ -65,6 +75,7 @@ namespace OsuSqlTool
             keys["Ladder"].Value = Ladder.ToString();
             keys["UseNotificationSound"].Value = UseNotificationSound.ToString();
             keys["NotificationSoundUri"].Value = NotificationSoundUri.ToString();
+            keys["NotificationVolume"].Value = NotificationVolume.ToString(CultureInfo.InvariantCulture);
 
             ini.Save(SettingsFile);
         }
@@ -78,13 +89,17 @@ namespace OsuSqlTool
         public static readonly DependencyProperty NotificationSoundUriProperty =
             DependencyProperty.Register("NotificationSoundUri", typeof(Uri), typeof(Settings), new PropertyMetadata(new Uri("file://")));
 
+        // Using a DependencyProperty as the backing store for NotificationVolume.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty NotificationVolumeProperty =
+            DependencyProperty.Register("NotificationVolume", typeof(double), typeof(Settings), new PropertyMetadata(1.0d));
+
         // Using a DependencyProperty as the backing store for Password.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty PasswordProperty =
             DependencyProperty.Register("Password", typeof(string), typeof(Settings), new PropertyMetadata(""));
 
         // Using a DependencyProperty as the backing store for UseNotificationSound.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty UseNotificationSoundProperty =
-            DependencyProperty.Register("UseNotificationSound", typeof(bool?), typeof(Settings), new PropertyMetadata(true));
+            DependencyProperty.Register("UseNotificationSound", typeof(bool), typeof(Settings), new PropertyMetadata(true));
 
         // Using a DependencyProperty as the backing store for Username.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty UsernameProperty =
@@ -102,13 +117,19 @@ namespace OsuSqlTool
             set { SetValue(NotificationSoundUriProperty, value); }
         }
 
+        public double NotificationVolume
+        {
+            get { return (double)GetValue(NotificationVolumeProperty); }
+            set { SetValue(NotificationVolumeProperty, value); }
+        }
+
         public string Password
         {
             get { return (string)GetValue(PasswordProperty); }
             set { SetValue(PasswordProperty, value); }
         }
 
-        public bool? UseNotificationSound
+        public bool UseNotificationSound
         {
             get { return (bool)GetValue(UseNotificationSoundProperty); }
             set { SetValue(UseNotificationSoundProperty, value); }
@@ -127,13 +148,39 @@ namespace OsuSqlTool
             PropertyChanged(this, new PropertyChangedEventArgs(e.Property.Name));
         }
 
-        private static TEnum ParseEnum<TEnum>(string value)
-                    where TEnum : struct
+        #region Parser
+        private static double ParseDouble(string value)
         {
-            TEnum val = default(TEnum);
-            Enum.TryParse<TEnum>(value, out val);
+            return ParseDouble(value, 0.0d);
+        }
+
+        private static double ParseDouble(string value, double defaultValue)
+        {
+            var val = defaultValue;
+            if (!double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out val))
+            {
+                val = defaultValue;
+            }
             return val;
         }
+
+        private static TEnum ParseEnum<TEnum>(string value)
+                                    where TEnum : struct
+        {
+            return ParseEnum<TEnum>(value, default(TEnum));
+        }
+
+        private static TEnum ParseEnum<TEnum>(string value, TEnum defaultValue)
+            where TEnum : struct
+        {
+            TEnum val = defaultValue;
+            if (!Enum.TryParse<TEnum>(value, out val))
+            {
+                val = defaultValue;
+            }
+            return val;
+        }
+        #endregion
 
         private void Load()
         {
@@ -144,16 +191,12 @@ namespace OsuSqlTool
             Ladder = ParseEnum<SQLLadder>(keys["Ladder"].Value);
             UseNotificationSound = keys["UseNotificationSound"].Value.ToLower() == "true";
             NotificationSoundUri = new Uri(keys["NotificationSoundUri"].Value);
+            NotificationVolume = ParseDouble(keys["NotificationVolume"].Value, 1);
         }
 
         private void SetDefault(string section, string name)
         {
             SetDefault(section, name, "");
-        }
-
-        private void SetDefault(string section, string name, object value)
-        {
-            SetDefault(section, name, value == null ? "" : value.ToString());
         }
 
         private void SetDefault(string section, string name, string value)
@@ -168,6 +211,17 @@ namespace OsuSqlTool
             {
                 sect.Keys.Add(name, value);
             }
+        }
+
+        private void SetDefault(string section, string name, IFormattable value)
+        {
+            SetDefault(section, name,
+                value == null ? "" : value.ToString(null, CultureInfo.InvariantCulture));
+        }
+
+        private void SetDefault(string section, string name, object value)
+        {
+            SetDefault(section, name, value == null ? "" : value.ToString());
         }
     }
 }

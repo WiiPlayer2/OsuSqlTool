@@ -6,9 +6,14 @@
         xmlns:local="clr-namespace:OsuSqlTool"
         mc:Ignorable="d" DataContext="{x:Static local:Settings.Instance}"
         d:DataContext="{d:DesignData Source={x:Static local:Settings.Instance}}"
-        Title="osu!SQL Tool - Settings" Height="200" Width="400"
+        Title="osu!SQL Tool - Settings" Height="200" Width="600"
         ResizeMode="NoResize" WindowStartupLocation="CenterOwner" Closed="Window_Closed"
-        Icon="osu_tool.png">
+        Icon="Icons/osu_tool.png">
+    <Window.Resources>
+        <Style TargetType="Label">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -16,7 +21,7 @@
         </Grid.RowDefinitions>
         <TabControl TabStripPlacement="Left">
             <TabItem Header="General">
-                <Grid>
+                <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
@@ -33,29 +38,47 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Notification">
-                <Grid>
+                <Grid Margin="5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <CheckBox IsChecked="{Binding UseNotificationSound}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <CheckBox IsChecked="{Binding UseNotificationSound}" Grid.ColumnSpan="2">
                         Play a notification sound if a match is found
                     </CheckBox>
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" IsEnabled="{Binding UseNotificationSound}">
-                        <Label>Soundfile:</Label>
-                        <TextBox IsReadOnly="True" Width="200" VerticalContentAlignment="Center"
+                    <Label Grid.Row="1">Soundfile:</Label>
+                    <Grid Grid.Row="1" Grid.Column="1" IsEnabled="{Binding UseNotificationSound}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <MediaElement x:Name="notifyMedia" />
+                        <TextBox IsReadOnly="True" VerticalContentAlignment="Center"
                                  Text="{Binding NotificationSoundUri}">
                             <TextBox.Background>
                                 <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlDarkColorKey}}"/>
                             </TextBox.Background>
                         </TextBox>
-                        <Button Click="SelectNotificationSoundFile_Click">
-                            Sel.
+                        <Button Grid.Column="1" Click="SelectNotificationSoundFile_Click"
+                                Width="30" Height="30" Margin="5,0,0,0">
+                            <Image Source="Icons/OpenFolder.ico" />
                         </Button>
-                        <Button Click="TestNotificationSound_Click">
-                            Test
+                        <Button Grid.Column="2" Click="TestNotificationSound_Click"
+                                Width="30" Height="30" Margin="5,0,0,0">
+                            <Image Source="Icons/PlayVideo_16x.png" />
                         </Button>
-                    </StackPanel>
+                    </Grid>
+                    <Label Grid.Row="2" IsEnabled="{Binding UseNotificationSound}">Volume:</Label>
+                    <Slider Grid.Row="2" Grid.Column="1" VerticalAlignment="Center"
+                            Minimum="0" Maximum="1" LargeChange="0.25"
+                            Value="{Binding NotificationVolume}"
+                            IsEnabled="{Binding UseNotificationSound}" />
                 </Grid>
             </TabItem>
         </TabControl>

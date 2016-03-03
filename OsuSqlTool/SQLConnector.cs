@@ -4,13 +4,16 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace OsuSqlTool
 {
     public class SQLConnector : INotifyPropertyChanged
     {
-        #region Public Constructors
+        private OsuIrcClient client;
+        private IrcUser osuSqlUser;
+        private Dictionary<Regex, Action<Match>> regexActions;
 
         public SQLConnector()
         {
@@ -23,19 +26,11 @@ namespace OsuSqlTool
             Maps = new SQLMapDownloader();
         }
 
-        #endregion Public Constructors
-
-        #region Public Events
-
         public event EventHandler Disconnected = (s, e) => { };
 
         public event EventHandler MatchFound = (s, e) => { };
 
         public event PropertyChangedEventHandler PropertyChanged = (s, e) => { };
-
-        #endregion Public Events
-
-        #region Public Properties
 
         public bool IsReady
         {
@@ -46,10 +41,6 @@ namespace OsuSqlTool
         }
 
         public SQLMapDownloader Maps { get; private set; }
-
-        #endregion Public Properties
-
-        #region Public Methods
 
         public void Ban(SQLMap map)
         {
@@ -87,39 +78,23 @@ namespace OsuSqlTool
 
         public void Queue(SQLLadder ladder)
         {
-            throw new NotImplementedException();
+            Chat("!queue {0}", ladder);
         }
 
         public void Ready()
         {
-            throw new NotImplementedException();
+            Chat("!ready");
         }
 
         public void Unqueue()
         {
-            throw new NotImplementedException();
+            Chat("!unqueue");
         }
-
-        #endregion Public Methods
-
-        #region Protected Methods
 
         protected void CallPropertyChanged(string name)
         {
             PropertyChanged(this, new PropertyChangedEventArgs(name));
         }
-
-        #endregion Protected Methods
-
-        #region Private Fields
-
-        private OsuIrcClient client;
-        private IrcUser osuSqlUser;
-
-        #endregion Private Fields
-
-        #region Private Methods
-
         private void Chat(string format, params object[] args)
         {
             client.LocalUser.SendMessage(osuSqlUser, string.Format(format, args));
@@ -154,9 +129,15 @@ namespace OsuSqlTool
                     osuSqlUser = e.Source as IrcUser;
                     CallPropertyChanged("IsReady");
                 }
+
+                var match = regexActions
+                    .Select(o => new Tuple<Match, Action<Match>>(o.Key.Match(e.Text), o.Value))
+                    .SingleOrDefault(o => o.Item1.Success);
+                if (match != null)
+                {
+                    match.Item2(match.Item1);
+                }
             }
         }
-
-        #endregion Private Methods
     }
 }

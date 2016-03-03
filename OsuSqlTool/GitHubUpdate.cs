@@ -7,11 +7,8 @@ using System.Net;
 
 namespace GitHubUpdate
 {
-    internal static class Update
+    public static class Update
     {
-        public static readonly DateTime BuildDate;
-        public static readonly Version CurrentVersion;
-
         private const string GITHUB_URL = "https://github.com/{0}/{1}/releases/latest";
 
         private static bool init = false;
@@ -81,6 +78,16 @@ namespace GitHubUpdate
         }
 
         public static Version NewestVersion
+        {
+            get; private set;
+        }
+
+        public static Version CurrentVersion
+        {
+            get; private set;
+        }
+
+        public static DateTime BuildDate
         {
             get; private set;
         }

@@ -8,7 +8,7 @@
         x:Name="root"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         IsEnabled="{Binding SQL.IsReady}"
-        Title="osu!SQL Tool" Height="600" Width="800" Icon="osu_tool.png">
+        Title="osu!SQL Tool" Height="600" Width="800" Icon="Icons/osu_tool.png">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -20,10 +20,11 @@
                 <MenuItem Header="Reload Maps" Click="Reload_Click" />
                 <Separator />
                 <MenuItem Header="Forget IRC Login" Click="ForgetLogin_Click" />
-                <MenuItem Header="Settings" Click="MenuItem_Click" />
+                <MenuItem Header="Settings" Click="Settings_Click" />
             </MenuItem>
-            <MenuItem Header="?" />
+            <MenuItem Header="?" Click="About_Click" />
         </Menu>
+        <MediaElement x:Name="notifyMedia" Visibility="Collapsed" />
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5">
             <TextBlock VerticalAlignment="Center" Margin="5,0,5,0">
                 Scale:

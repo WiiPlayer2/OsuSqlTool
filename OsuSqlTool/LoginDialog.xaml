@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:OsuSqlTool"
         mc:Ignorable="d" x:Name="root"
         Title="Login to osu!IRC" Height="100" Width="500" ResizeMode="NoResize"
-        WindowStartupLocation="CenterOwner" Icon="osu_tool.png">
+        WindowStartupLocation="CenterOwner" Icon="Icons/osu_tool.png">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

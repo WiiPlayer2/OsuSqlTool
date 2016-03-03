@@ -18,5 +18,13 @@
                  Path="UseNotificationSound" />
         <Binding x:Key="notificationUriSetting" Source="{x:Static local:Settings.Instance}"
                  Path="NotificationSoundUri" />
+        <Binding x:Key="notificationVolumeSetting" Source="{x:Static local:Settings.Instance}"
+                 Path="NotificationVolume" />
+        <Style TargetType="MediaElement">
+            <Setter Property="LoadedBehavior" Value="Manual" />
+            <Setter Property="Source" Value="{StaticResource notificationUriSetting}" />
+            <Setter Property="Volume" Value="{StaticResource notificationVolumeSetting}" />
+            <Setter Property="Visibility" Value="Collapsed" />
+        </Style>
     </Application.Resources>
 </Application>

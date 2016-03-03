@@ -57,7 +57,8 @@ namespace OsuSqlTool
 
         private void TestNotificationSound_Click(object sender, RoutedEventArgs e)
         {
-
+            notifyMedia.Stop();
+            notifyMedia.Play();
         }
     }
 }

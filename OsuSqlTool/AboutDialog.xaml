@@ -1,0 +1,42 @@
+﻿<Window x:Class="OsuSqlTool.AboutDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OsuSqlTool"
+        xmlns:update="clr-namespace:GitHubUpdate"
+        mc:Ignorable="d" Icon="Icons/osu_tool.png"
+        Title="About" Height="230" Width="400" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock FontSize="40" HorizontalAlignment="Center" Margin="10">
+            osu!SQL Tool
+        </TextBlock>
+        <TextBlock Grid.Row="1" TextWrapping="Wrap">
+            This software is running version
+            <Run Text="{Binding Source={x:Static update:Update.CurrentVersion}, Mode=OneTime}" />
+            build on
+            <Run Text="{Binding Source={x:Static update:Update.BuildDate}, Mode=OneTime, StringFormat=u}" />
+            .
+            <LineBreak />
+            <LineBreak />
+            The newest version is
+            <Run Text="{Binding Source={x:Static update:Update.NewestVersion}, Mode=OneTime, StringFormat=u}" />
+            and can be downloaded
+            <Hyperlink NavigateUri="{Binding Source={x:Static update:Update.ReleaseUrl}, Mode=OneTime}"
+                       ToolTip="{Binding Source={x:Static update:Update.ReleaseUrl}, Mode=OneTime}"
+                       RequestNavigate="Hyperlink_RequestNavigate">
+                here
+            </Hyperlink>
+        </TextBlock>
+        <TextBlock Grid.Row="100" TextWrapping="Wrap" TextAlignment="Center" FontSize="10"
+                   Foreground="Gray">
+            Copyright © 2016 DarkLink, This software is not affiliated with osu! by ppy nor osu!SQL by ascendance. 
+        </TextBlock>
+    </Grid>
+</Window>

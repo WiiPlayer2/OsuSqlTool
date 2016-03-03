@@ -138,10 +138,16 @@ namespace OsuSqlTool
             SQL.Disconnect();
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void Settings_Click(object sender, RoutedEventArgs e)
         {
             var option = new OptionsDialog();
             option.ShowDialog();
+        }
+
+        private void About_Click(object sender, RoutedEventArgs e)
+        {
+            var about = new AboutDialog();
+            about.ShowDialog();
         }
     }
 }
