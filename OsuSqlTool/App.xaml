@@ -22,6 +22,7 @@
                  Path="NotificationVolume" />
         <Style TargetType="MediaElement">
             <Setter Property="LoadedBehavior" Value="Manual" />
+            <Setter Property="UnloadedBehavior" Value="Stop" />
             <Setter Property="Source" Value="{StaticResource notificationUriSetting}" />
             <Setter Property="Volume" Value="{StaticResource notificationVolumeSetting}" />
             <Setter Property="Visibility" Value="Collapsed" />

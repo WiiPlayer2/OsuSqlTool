@@ -33,10 +33,20 @@ namespace OsuSqlTool
         {
             SQL = new SQLConnector();
             SQL.Disconnected += Sql_Disconnected;
+            SQL.MatchFound += SQL_MatchFound;
 
             Settings.Instance.PropertyChanged += Instance_PropertyChanged;
 
             InitializeComponent();
+        }
+
+        private void SQL_MatchFound(object sender, EventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                notifyMedia.Stop();
+                notifyMedia.Play();
+            });
         }
 
         private void Instance_PropertyChanged(object sender, PropertyChangedEventArgs e)

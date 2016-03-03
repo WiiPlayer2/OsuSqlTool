@@ -24,6 +24,11 @@ namespace OsuSqlTool
             client.MotdReceived += Client_MotdReceived;
 
             Maps = new SQLMapDownloader();
+
+            regexActions = new Dictionary<Regex, Action<Match>>();
+            RegisterAction("^A match was found!.*$", ChatMatchFound);
+            RegisterAction("^You're queued up!.*$", ChatQueuedUp);
+            RegisterAction("^You failed to ready up in time!$", ChatReadyFailed);
         }
 
         public event EventHandler Disconnected = (s, e) => { };
@@ -95,10 +100,28 @@ namespace OsuSqlTool
         {
             PropertyChanged(this, new PropertyChangedEventArgs(name));
         }
+
         private void Chat(string format, params object[] args)
         {
             client.LocalUser.SendMessage(osuSqlUser, string.Format(format, args));
         }
+
+        #region ChatActions
+        private void ChatMatchFound(Match obj)
+        {
+            MatchFound(this, EventArgs.Empty);
+        }
+
+        private void ChatQueuedUp(Match obj)
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void ChatReadyFailed(Match obj)
+        {
+            //throw new NotImplementedException();
+        }
+        #endregion
 
         private void Client_Connected(object sender, EventArgs e)
         {
@@ -138,6 +161,11 @@ namespace OsuSqlTool
                     match.Item2(match.Item1);
                 }
             }
+        }
+
+        private void RegisterAction(string regex, Action<Match> action)
+        {
+            regexActions[new Regex(regex)] = action;
         }
     }
 }
