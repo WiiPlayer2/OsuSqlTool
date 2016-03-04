@@ -27,6 +27,7 @@ namespace OsuSqlTool
             Maps = new SQLMapDownloader();
             Matches = new SQLMatchDownloader();
             Matches.MatchFound += Matches_MatchFound;
+            Matches.NoMatchFound += Matches_NoMatchFound;
 
             regexActions = new Dictionary<Regex, Action<Match>>();
             RegisterAction("^A match was found!.*$", ChatMatchFound);
@@ -35,11 +36,32 @@ namespace OsuSqlTool
             RegisterAction("^You're no longer searching for a match!$", ChatUnqueued);
         }
 
+        private void Matches_NoMatchFound(object sender, EventArgs e)
+        {
+            if (Maps.AreMapsLoaded)
+            {
+                foreach (var m in Maps.AllMaps)
+                {
+                    m.IsBanned = false;
+                    m.IsPicked = false;
+                }
+            }
+        }
+
         private void Matches_MatchFound(object sender, SQLMatch e)
         {
             if (Maps.AreMapsLoaded)
             {
-
+                var ladder = e.Ladder;
+                var maps = Maps.GetLadderMaps(ladder).ToArray();
+                foreach (var i in e.Bans)
+                {
+                    maps[i].IsBanned = true;
+                }
+                foreach (var i in e.Picks)
+                {
+                    maps[i].IsPicked = true;
+                }
             }
         }
 

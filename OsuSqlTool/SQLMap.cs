@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -8,8 +9,11 @@ using System.Threading.Tasks;
 
 namespace OsuSqlTool
 {
-    public class SQLMap
+    public class SQLMap : INotifyPropertyChanged
     {
+        private bool isBanned = false;
+        private bool isPicked = false;
+
         public SQLMap()
         {
             Artist = "- No Artist -";
@@ -153,5 +157,53 @@ namespace OsuSqlTool
                 return string.Format("http://b.ppy.sh/thumb/{0}l.jpg", MapSetID);
             }
         }
+
+        public bool IsPicked
+        {
+            get
+            {
+                return isPicked;
+            }
+            set
+            {
+                if (isPicked != value)
+                {
+                    isPicked = value;
+                    CallPropertChanged("IsPicked");
+                    CallPropertChanged("IsPickable");
+                }
+            }
+        }
+
+        public bool IsBanned
+        {
+            get
+            {
+                return isBanned;
+            }
+            set
+            {
+                if (isBanned != value)
+                {
+                    isBanned = value;
+                    CallPropertChanged("IsBanned");
+                    CallPropertChanged("IsPickable");
+                }
+            }
+        }
+
+        public bool IsPickable
+        {
+            get
+            {
+                return !IsPicked && !IsBanned;
+            }
+        }
+
+        private void CallPropertChanged(string name)
+        {
+            PropertyChanged(this, new PropertyChangedEventArgs(name));
+        }
+        public event PropertyChangedEventHandler PropertyChanged = (s, e) => { };
     }
 }

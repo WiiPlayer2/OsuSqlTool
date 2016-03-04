@@ -57,6 +57,16 @@ namespace OsuSqlTool
             return maps[ladder];
         }
 
+        public IEnumerable<SQLMap> AllMaps
+        {
+            get
+            {
+                return Enum.GetValues(typeof(SQLLadder))
+                    .Cast<SQLLadder>()
+                    .SelectMany(o => GetLadderMaps(o));
+            }
+        }
+
         public bool AreMapsLoaded { get; private set; }
     }
 }

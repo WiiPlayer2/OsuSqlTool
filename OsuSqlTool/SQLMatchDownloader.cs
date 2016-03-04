@@ -34,22 +34,28 @@ namespace OsuSqlTool
             {
 #endif
             var matches = GetData();
-            var username = "Neko-sama".ToLower();//Settings.Instance.Username.ToLower();
+            var username = Settings.Instance.Username.ToLower();
             var match = matches
                 .SingleOrDefault(o => o.SetPlayers(username));
             if (match != null)
             {
                 MatchFound(this, match);
             }
+            else
+            {
+                NoMatchFound(this, EventArgs.Empty);
+            }
 #if !DEBUG
             }
             catch { }
 #else
-            refreshTimer.Stop();
+            refreshTimer.Start();
 #endif
         }
 
         public event EventHandler<SQLMatch> MatchFound = (s, e) => { };
+
+        public event EventHandler NoMatchFound = (s, e) => { };
 
         public void Start()
         {

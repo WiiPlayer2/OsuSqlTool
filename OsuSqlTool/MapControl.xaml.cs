@@ -65,12 +65,33 @@ namespace OsuSqlTool
 
             if (e.Property == MapProperty)
             {
+                Map.PropertyChanged += Map_PropertyChanged;
                 if (Map.Category == SQLCategory.Tiebreaker)
                 {
                     pickButton.Visibility = Visibility.Collapsed;
                     banButton.Visibility = Visibility.Collapsed;
                 }
             }
+        }
+
+        private void Map_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                switch (e.PropertyName)
+                {
+                    case "IsPickable":
+                        if (Map.IsPickable)
+                        {
+                            Visibility = Visibility.Visible;
+                        }
+                        else
+                        {
+                            Visibility = Visibility.Collapsed;
+                        }
+                        break;
+                }
+            });
         }
     }
 }
