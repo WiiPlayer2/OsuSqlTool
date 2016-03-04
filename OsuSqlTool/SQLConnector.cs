@@ -25,12 +25,22 @@ namespace OsuSqlTool
             client.MotdReceived += Client_MotdReceived;
 
             Maps = new SQLMapDownloader();
+            Matches = new SQLMatchDownloader();
+            Matches.MatchFound += Matches_MatchFound;
 
             regexActions = new Dictionary<Regex, Action<Match>>();
             RegisterAction("^A match was found!.*$", ChatMatchFound);
             RegisterAction("^You're queued up!.*$", ChatQueuedUp);
             RegisterAction("^You failed to ready up in time!$", ChatReadyFailed);
             RegisterAction("^You're no longer searching for a match!$", ChatUnqueued);
+        }
+
+        private void Matches_MatchFound(object sender, SQLMatch e)
+        {
+            if (Maps.AreMapsLoaded)
+            {
+
+            }
         }
 
         public event EventHandler Disconnected = (s, e) => { };
@@ -65,7 +75,10 @@ namespace OsuSqlTool
                 return osuSqlUser != null;
             }
         }
+
         public SQLMapDownloader Maps { get; private set; }
+
+        public SQLMatchDownloader Matches { get; private set; }
 
         public void Ban(SQLMap map)
         {
@@ -93,6 +106,7 @@ namespace OsuSqlTool
 
         public void Disconnect()
         {
+            Matches.Stop();
             client.Disconnect();
         }
 
@@ -179,6 +193,7 @@ namespace OsuSqlTool
                 if (osuSqlUser == null)
                 {
                     osuSqlUser = e.Source as IrcUser;
+                    Matches.Start();
                     CallPropertyChanged("IsReady");
                 }
 
