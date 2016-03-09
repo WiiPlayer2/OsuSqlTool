@@ -58,7 +58,8 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <MediaElement x:Name="notifyMedia" />
+                        <MediaElement x:Name="notifyMedia" MediaEnded="notifyMedia_StopMedia"
+                                      Unloaded="notifyMedia_StopMedia"/>
                         <TextBox IsReadOnly="True" VerticalContentAlignment="Center"
                                  Text="{Binding NotificationSoundUri}">
                             <TextBox.Background>

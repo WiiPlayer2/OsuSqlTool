@@ -70,11 +70,14 @@ namespace OsuSqlTool
 
         private void SQL_MatchFound(object sender, EventArgs e)
         {
-            Dispatcher.Invoke(() =>
+            if (Settings.Instance.UseNotificationSound)
             {
-                notifyMedia.Stop();
-                notifyMedia.Play();
-            });
+                Dispatcher.Invoke(() =>
+                {
+                    notifyMedia.Stop();
+                    notifyMedia.Play();
+                });
+            }
         }
 
         private void Instance_PropertyChanged(object sender, PropertyChangedEventArgs e)

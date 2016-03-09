@@ -60,5 +60,10 @@ namespace OsuSqlTool
             notifyMedia.Stop();
             notifyMedia.Play();
         }
+
+        private void notifyMedia_StopMedia(object sender, RoutedEventArgs e)
+        {
+            notifyMedia.Stop();
+        }
     }
 }
