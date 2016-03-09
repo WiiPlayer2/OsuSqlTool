@@ -13,9 +13,11 @@ using System.Windows;
 
 namespace OsuSqlTool
 {
-    public class Settings : DependencyObject, INotifyPropertyChanged
+    public class Settings : INotifyPropertyChanged
     {
         private IniFile ini;
+
+        private Dictionary<string, object> settingValues = new Dictionary<string, object>();
 
         static Settings()
         {
@@ -53,6 +55,11 @@ namespace OsuSqlTool
             Load();
         }
 
+        private void CallPropertyChanged(string name)
+        {
+            PropertyChanged(this, new PropertyChangedEventArgs(name));
+        }
+
         public event PropertyChangedEventHandler PropertyChanged = (s, e) => { };
 
         public static Settings Instance { get; private set; }
@@ -81,72 +88,42 @@ namespace OsuSqlTool
         }
 
         #region Values
-        // Using a DependencyProperty as the backing store for Ladder.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty LadderProperty =
-            DependencyProperty.Register("Ladder", typeof(SQLLadder), typeof(Settings), new PropertyMetadata(SQLLadder.Beginner));
-
-        // Using a DependencyProperty as the backing store for NotificationSoundUri.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty NotificationSoundUriProperty =
-            DependencyProperty.Register("NotificationSoundUri", typeof(Uri), typeof(Settings), new PropertyMetadata(new Uri("file://")));
-
-        // Using a DependencyProperty as the backing store for NotificationVolume.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty NotificationVolumeProperty =
-            DependencyProperty.Register("NotificationVolume", typeof(double), typeof(Settings), new PropertyMetadata(1.0d));
-
-        // Using a DependencyProperty as the backing store for Password.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty PasswordProperty =
-            DependencyProperty.Register("Password", typeof(string), typeof(Settings), new PropertyMetadata(""));
-
-        // Using a DependencyProperty as the backing store for UseNotificationSound.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty UseNotificationSoundProperty =
-            DependencyProperty.Register("UseNotificationSound", typeof(bool), typeof(Settings), new PropertyMetadata(true));
-
-        // Using a DependencyProperty as the backing store for Username.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty UsernameProperty =
-            DependencyProperty.Register("Username", typeof(string), typeof(Settings), new PropertyMetadata(""));
-
         public SQLLadder Ladder
         {
-            get { return (SQLLadder)GetValue(LadderProperty); }
-            set { SetValue(LadderProperty, value); }
+            get { return GetValue<SQLLadder>("Ladder"); }
+            set { SetValue("Ladder", value); }
         }
 
         public Uri NotificationSoundUri
         {
-            get { return (Uri)GetValue(NotificationSoundUriProperty); }
-            set { SetValue(NotificationSoundUriProperty, value); }
+            get { return GetValue<Uri>("NotificationSoundUri"); }
+            set { SetValue("NotificationSoundUri", value); }
         }
 
         public double NotificationVolume
         {
-            get { return (double)GetValue(NotificationVolumeProperty); }
-            set { SetValue(NotificationVolumeProperty, value); }
+            get { return GetValue<double>("NotificationVolume"); }
+            set { SetValue("NotificationVolume", value); }
         }
 
         public string Password
         {
-            get { return (string)GetValue(PasswordProperty); }
-            set { SetValue(PasswordProperty, value); }
+            get { return GetValue<string>("Password"); }
+            set { SetValue("Password", value); }
         }
 
         public bool UseNotificationSound
         {
-            get { return (bool)GetValue(UseNotificationSoundProperty); }
-            set { SetValue(UseNotificationSoundProperty, value); }
+            get { return GetValue<bool>("UseNotificationSound"); }
+            set { SetValue("UseNotificationSound", value); }
         }
 
         public string Username
         {
-            get { return (string)GetValue(UsernameProperty); }
-            set { SetValue(UsernameProperty, value); }
+            get { return GetValue<string>("Username"); }
+            set { SetValue("Username", value); }
         }
         #endregion Values
-
-        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
-        {
-            base.OnPropertyChanged(e);
-            PropertyChanged(this, new PropertyChangedEventArgs(e.Property.Name));
-        }
 
         #region Parser
         private static double ParseDouble(string value)
@@ -179,6 +156,27 @@ namespace OsuSqlTool
                 val = defaultValue;
             }
             return val;
+        }
+        #endregion
+
+        #region Setter + Getter
+        private T GetValue<T>(string name)
+        {
+            if (!settingValues.ContainsKey(name))
+            {
+                return default(T);
+            }
+            return (T)settingValues[name];
+        }
+
+        private void SetValue(string name, object value)
+        {
+            if (!settingValues.ContainsKey(name)
+                || !settingValues[name].Equals(value))
+            {
+                settingValues[name] = value;
+                CallPropertyChanged(name);
+            }
         }
         #endregion
 
