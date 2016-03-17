@@ -34,6 +34,27 @@ namespace OsuSqlTool
             RegisterAction("^You're queued up!.*$", ChatQueuedUp);
             RegisterAction("^You failed to ready up in time!$", ChatReadyFailed);
             RegisterAction("^You're no longer searching for a match!$", ChatUnqueued);
+            RegisterAction("^You did not queue in the ladder for your osu rank!.*$", ChatUnqueueable);
+
+            Settings.Instance.PropertyChanged += Instance_PropertyChanged;
+        }
+
+        private void Instance_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "Ladder":
+                    if (CurrentState == SQLState.Unqueueable)
+                    {
+                        CurrentState = SQLState.Unqueued;
+                    }
+                    break;
+            }
+        }
+
+        private void ChatUnqueueable(Match obj)
+        {
+            CurrentState = SQLState.Unqueueable;
         }
 
         private void Matches_NoMatchFound(object sender, EventArgs e)
@@ -45,6 +66,10 @@ namespace OsuSqlTool
                     m.IsBanned = false;
                     m.IsPicked = false;
                 }
+            }
+            if (CurrentState == SQLState.MatchFound)
+            {
+                CurrentState = SQLState.Unqueued;
             }
         }
 
@@ -63,6 +88,7 @@ namespace OsuSqlTool
                     maps[i].IsPicked = true;
                 }
             }
+            CurrentState = SQLState.InGame;
         }
 
         public event EventHandler Disconnected = (s, e) => { };
@@ -74,6 +100,7 @@ namespace OsuSqlTool
         public event EventHandler Queued = (s, e) => { };
 
         public event EventHandler Unqueued = (s, e) => { };
+
         public SQLState CurrentState
         {
             get

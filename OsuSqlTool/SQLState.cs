@@ -4,6 +4,8 @@
     {
         Unqueued,
         MatchFound,
-        Queued
+        Queued,
+        InGame,
+        Unqueueable,
     }
 }

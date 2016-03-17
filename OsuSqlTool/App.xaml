@@ -60,5 +60,8 @@
         <SolidColorBrush x:Key="readyColor">
             #FF42d44b
         </SolidColorBrush>
+        <SolidColorBrush x:Key="unqueueableColor">
+            #FFFF0000
+        </SolidColorBrush>
     </Application.Resources>
 </Application>

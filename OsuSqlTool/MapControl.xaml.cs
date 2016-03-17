@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -83,15 +84,22 @@ namespace OsuSqlTool
                     case "IsPickable":
                         if (Map.IsPickable)
                         {
-                            Visibility = Visibility.Visible;
+                            //Visibility = Visibility.Visible;
                         }
                         else
                         {
-                            Visibility = Visibility.Collapsed;
+                            //Visibility = Visibility.Collapsed;
                         }
                         break;
                 }
             });
+        }
+
+        private void Download_Click(object sender, RoutedEventArgs e)
+        {
+            //Process.Start(string.Format("http://osu.ppy.sh/s/{0}", Map.MapSetID));
+            //Process.Start(string.Format("osu://dl/{0}", Map.MapSetID));
+            Process.Start(string.Format(Settings.Instance.DownloadFormat, Map.MapSetID));
         }
     }
 }

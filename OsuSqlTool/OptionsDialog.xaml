@@ -28,6 +28,7 @@
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Label>Current Ladder:</Label>
                     <ComboBox Grid.Column="1" SelectedValue="{Binding Ladder}" VerticalContentAlignment="Center">
@@ -35,6 +36,9 @@
                         <local:SQLLadder>Standard</local:SQLLadder>
                         <local:SQLLadder>Expert</local:SQLLadder>
                     </ComboBox>
+                    <CheckBox Grid.Row="1" Grid.ColumnSpan="2" IsChecked="{Binding UseOsuDirect}">
+                        Use osu!direct downloads
+                    </CheckBox>
                 </Grid>
             </TabItem>
             <TabItem Header="Notification">

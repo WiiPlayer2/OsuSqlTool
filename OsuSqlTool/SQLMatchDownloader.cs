@@ -35,8 +35,9 @@ namespace OsuSqlTool
 #endif
             var matches = GetData();
             var username = Settings.Instance.Username.ToLower();
+            //var username = "HahaGeorg".ToLower();
             var match = matches
-                .SingleOrDefault(o => o.SetPlayers(username));
+            .SingleOrDefault(o => o.SetPlayers(username));
             if (match != null)
             {
                 MatchFound(this, match);

@@ -47,6 +47,7 @@ namespace OsuSqlTool
             SetDefault("General", "Password", "");
             SetDefault("General", "Ladder", SQLLadder.Beginner);
             SetDefault("General", "UseNotificationSound", true);
+            SetDefault("General", "UseOsuDirect", false);
             SetDefault("General", "NotificationSoundUri", "file://");
             SetDefault("General", "NotificationVolume", 1.0d);
 
@@ -83,6 +84,7 @@ namespace OsuSqlTool
             keys["UseNotificationSound"].Value = UseNotificationSound.ToString();
             keys["NotificationSoundUri"].Value = NotificationSoundUri.ToString();
             keys["NotificationVolume"].Value = NotificationVolume.ToString(CultureInfo.InvariantCulture);
+            keys["UseOsuDirect"].Value = UseOsuDirect.ToString();
 
             ini.Save(SettingsFile);
         }
@@ -122,6 +124,27 @@ namespace OsuSqlTool
         {
             get { return GetValue<string>("Username"); }
             set { SetValue("Username", value); }
+        }
+
+        public bool UseOsuDirect
+        {
+            get { return GetValue<bool>("UseOsuDirect"); }
+            set { SetValue("UseOsuDirect", value, "DownloadFormat"); }
+        }
+
+        public string DownloadFormat
+        {
+            get
+            {
+                if (UseOsuDirect)
+                {
+                    return "osu://dl/{0}";
+                }
+                else
+                {
+                    return "http://osu.ppy.sh/s/{0}";
+                }
+            }
         }
         #endregion Values
 
@@ -169,13 +192,17 @@ namespace OsuSqlTool
             return (T)settingValues[name];
         }
 
-        private void SetValue(string name, object value)
+        private void SetValue(string name, object value, params string[] dependentProps)
         {
             if (!settingValues.ContainsKey(name)
                 || !settingValues[name].Equals(value))
             {
                 settingValues[name] = value;
                 CallPropertyChanged(name);
+                foreach (var s in dependentProps)
+                {
+                    CallPropertyChanged(s);
+                }
             }
         }
         #endregion
@@ -188,6 +215,7 @@ namespace OsuSqlTool
             Password = keys["Password"].Value;
             Ladder = ParseEnum<SQLLadder>(keys["Ladder"].Value);
             UseNotificationSound = keys["UseNotificationSound"].Value.ToLower() == "true";
+            UseOsuDirect = keys["UseOsuDirect"].Value.ToLower() == "true";
             NotificationSoundUri = new Uri(keys["NotificationSoundUri"].Value);
             NotificationVolume = ParseDouble(keys["NotificationVolume"].Value, 1);
         }

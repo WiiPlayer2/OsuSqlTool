@@ -4,9 +4,44 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OsuSqlTool"
+             xmlns:controls="clr-namespace:OsuSqlTool.Controls"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=local:SQLMap, IsDesignTimeCreatable=True}"
              Width="200" Height="150" Foreground="White" Margin="2.5">
+    <UserControl.Style>
+        <Style>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsPickable}" Value="False">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Width"
+                                                 To="0" />
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 To="0" />
+                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
+                                    <DiscreteObjectKeyFrame Value="{x:Static Visibility.Collapsed}" />
+                                </ObjectAnimationUsingKeyFrames>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Width"
+                                                 To="200" />
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 To="1" />
+                                <ObjectAnimationUsingKeyFrames BeginTime="0" Storyboard.TargetProperty="Visibility">
+                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                                </ObjectAnimationUsingKeyFrames>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
     <Grid>
         <Image Source="{Binding MapSetThumbnailURL}" Stretch="UniformToFill" />
         <Grid Background="#80000000">
@@ -46,6 +81,30 @@
                     Ban
                 </Button>
             </StackPanel>
+            <controls:RoundButton HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                                  Width="30" Height="30" Margin="5" Click="Download_Click">
+                <controls:RoundButton.ToolTip>
+                    <ToolTip Content="{Binding MapSetID}"
+                             ContentStringFormat="{Binding Source={x:Static local:Settings.Instance}, Path=DownloadFormat}" />
+                </controls:RoundButton.ToolTip>
+                <Viewbox Width="16" Height="16" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+                    <Rectangle Width="16" Height="16">
+                        <Rectangle.Fill>
+                            <DrawingBrush>
+                                <DrawingBrush.Drawing>
+                                    <DrawingGroup>
+                                        <DrawingGroup.Children>
+                                            <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M16,16L0,16 0,0 16,0z" />
+                                            <GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M13,3L13,10 8,15 3,10 3,3 6,6 6,1 10,1 10,6z" />
+                                            <GeometryDrawing Brush="#FFEA67A1" Geometry="F1M12,6L12,9 8,13 4,9 4,6 7,9 7,2 9,2 9,9z" />
+                                        </DrawingGroup.Children>
+                                    </DrawingGroup>
+                                </DrawingBrush.Drawing>
+                            </DrawingBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </Viewbox>
+            </controls:RoundButton>
         </Grid>
     </Grid>
 </UserControl>

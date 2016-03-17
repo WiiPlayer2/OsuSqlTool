@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OsuSqlTool"
+        xmlns:controls="clr-namespace:OsuSqlTool.Controls"
         mc:Ignorable="d" Loaded="Window_Loaded"
         x:Name="root"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
@@ -22,7 +23,10 @@
                 <MenuItem Header="Forget IRC Login" Click="ForgetLogin_Click" />
                 <MenuItem Header="Settings" Click="Settings_Click" />
             </MenuItem>
-            <MenuItem Header="?" Click="About_Click" />
+            <MenuItem Header="?">
+                <MenuItem Header="Send Feedback" Click="SendFeedback_Click" />
+                <MenuItem Header="About" Click="About_Click" />
+            </MenuItem>
         </Menu>
         <MediaElement x:Name="notifyMedia" Visibility="Collapsed" />
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5">
@@ -59,19 +63,11 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
-        <Button x:Name="queueButton" Grid.Row="2" Width="100" Height="100" Margin="30"
-                HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                Foreground="White" Click="Queue_Click" Background="{StaticResource queueColor}">
-            <Button.Template>
-                <ControlTemplate TargetType="Button">
-                    <Grid>
-                        <Ellipse Fill="{TemplateBinding Background}" />
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                                          Content="{TemplateBinding Content}"/>
-                    </Grid>
-                </ControlTemplate>
-            </Button.Template>
+        <controls:RoundButton x:Name="queueButton" Grid.Row="2" Width="100" Height="100" Margin="30"
+                              HorizontalAlignment="Right" VerticalAlignment="Bottom" Opacity="0.7"
+                              Foreground="White" Click="Queue_Click"
+                              Background="{StaticResource queueColor}">
             Queue
-        </Button>
+        </controls:RoundButton>
     </Grid>
 </Window>

@@ -51,6 +51,10 @@ namespace OsuSqlTool
                     queueButton.Opacity = 0.7;
                     switch (SQL.CurrentState)
                     {
+                        case SQLState.Unqueueable:
+                            queueButton.Content = "Unqueueable";
+                            queueButton.Background = FindResource("unqueueableColor") as Brush;
+                            break;
                         case SQLState.Unqueued:
                             queueButton.Content = "Queue";
                             queueButton.Background = FindResource("queueColor") as Brush;
@@ -207,7 +211,16 @@ namespace OsuSqlTool
                 case SQLState.MatchFound:
                     SQL.Ready();
                     break;
+                default:
+                    queueButton.IsEnabled = true;
+                    queueButton.Opacity = 0.7;
+                    break;
             }
+        }
+
+        private void SendFeedback_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("http://new.ppy.sh/forum/t/426617");
         }
     }
 }
